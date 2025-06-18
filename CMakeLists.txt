@@ -22,8 +22,24 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/tools/cmake")
 # 自动检测和设置vcpkg
 include(vcpkg-setup)
 
+# 首先添加自定义库的子目录
+add_subdirectory(libs/my-math-lib)
+
 # 查找依赖包
 find_package(fmt CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+
+# 可选依赖包（根据需要取消注释）
+# find_package(nlohmann_json CONFIG REQUIRED)
+# find_package(Boost REQUIRED COMPONENTS system)
+# find_package(CURL CONFIG REQUIRED)
+# find_package(unofficial-sqlite3 CONFIG REQUIRED)
+# find_package(OpenSSL REQUIRED)
+# find_package(protobuf CONFIG REQUIRED)
+# find_package(gRPC CONFIG REQUIRED)
+# find_package(opencv CONFIG REQUIRED)
+# find_package(Eigen3 CONFIG REQUIRED)
+# find_package(Catch2 CONFIG REQUIRED)
 
 # 包含目录
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -35,8 +51,30 @@ file(GLOB_RECURSE HEADERS "include/*.h" "include/*.hpp")
 # 创建可执行文件
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
-# 链接库
-target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
+# 链接基础库
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+    fmt::fmt
+    spdlog::spdlog
+    MyMath::MathLib  # 自定义数学库
+)
+
+# 可选库链接（根据需要取消注释）
+# target_link_libraries(${PROJECT_NAME} PRIVATE 
+#     nlohmann_json::nlohmann_json
+#     Boost::system
+#     CURL::libcurl
+#     unofficial::sqlite3::sqlite3
+#     OpenSSL::SSL OpenSSL::Crypto
+#     protobuf::libprotobuf
+#     gRPC::grpc++
+#     opencv_core opencv_imgproc opencv_imgcodecs
+#     Eigen3::Eigen
+# )
+
+# 测试库链接（仅在构建测试时）
+if(BUILD_TESTS)
+    # target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+endif()
 
 # 设置编译器选项
 if(MSVC)
